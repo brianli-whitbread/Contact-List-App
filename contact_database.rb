@@ -15,7 +15,8 @@ class ContactDatabase
       id = row[0]
       name = row[1]
       email = row[2]
-      contact = Contact.new(id, name, email)
+      phone = row [3]
+      contact = Contact.new(id, name, email, phone)
       @array_of_contacts << contact
 
 
@@ -26,7 +27,7 @@ class ContactDatabase
   def find_contact_by_id(id)
     load_contacts
     contact = @array_of_contacts.detect {|contact| contact.id == id}
-    puts contact == nil ? "Sorry, contact cannot be found" : "#{contact.id}: #{contact.name}(#{contact.email})"
+    puts contact == nil ? "Sorry, contact cannot be found" : "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
   end
 
   def find_contact_by_list_index(index)
@@ -38,18 +39,18 @@ class ContactDatabase
       #if multiple results, then do this
       if contact_find.length > 1
         contact_find.each do |contact|
-          puts "#{contact.id}: #{contact.name}(#{contact.email})"
+          puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
         end
       else
-        contact_find = contact_find[0]
-        puts "#{contact_find.id}: #{contact_find.name}(#{contact_find.email})"
+        contact = contact_find[0]
+        puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
       end
     else
       contact_find = @array_of_contacts.select { |contact| contact.name.match index }
 
       if contact_find.length > 1
         contact_find.each do |contact|
-          puts "#{contact.id}: #{contact.name}(#{contact.email})"
+          puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
         end
       else
         contact_find = contact_find[0]
@@ -63,17 +64,17 @@ class ContactDatabase
     load_contacts
     puts "Full List of Contacts: "
     @array_of_contacts.each do |contact|
-      puts "#{contact.id}: #{contact.name}#{contact.email}"
+      puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
     end
     puts "---\nTotal of #{@array_of_contacts.length} contacts"
 
   end
 
-  def create_new_contact(name, email)
+  def create_new_contact(name, email, phone)
     load_contacts
     #figures out the next ID
     next_id_to_append = @array_of_contacts.length + 1
-    @new_user_to_add = Contact.new(next_id_to_append, name, email)
+    @new_user_to_add = Contact.new(next_id_to_append, name, email, phone)
     contact_info_validation
   end
 
@@ -92,7 +93,7 @@ class ContactDatabase
     # enters, and information is passed on to the database
     CSV.open('contacts.csv', 'w') do |csv_object|
       @array_of_contacts.each do |contact|
-        csv_object << [contact.id, contact.name, contact.email]
+        csv_object << [contact.id, contact.name, contact.email, contact.phone]
       end
     end
   end

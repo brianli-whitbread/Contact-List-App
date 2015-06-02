@@ -10,13 +10,36 @@ def help_menu
     execute(STDIN.gets.chomp)
 end
 
+def set_phone
+  phone_numbers = ''
+
+  adding_phone_numbers = true
+
+  while adding_phone_numbers
+    phone_numbers << "; " unless phone_numbers.empty?
+    puts "Label for the Phone Number"
+    print "> "
+    phone_numbers << STDIN.gets.chomp + ":"
+    puts "Phone Number"
+    print "> "
+    phone_numbers << " " + STDIN.gets.chomp
+    puts "add another number? (yes/no)"
+    if STDIN.gets.chomp == "yes"
+    else
+      adding_phone_numbers = false;
+    end
+  end
+  return phone_numbers
+end
+
 def new_contact
   puts "Add New Contact"
   print "Name: "
   name = STDIN.gets.chomp
   print "Email: "
   email = STDIN.gets.chomp
-  Contact.create(name, email)
+  phone = set_phone
+  Contact.create(name, email, phone)
   #loop
   #keep asking user for mobile type, then mobile number
 end
@@ -66,6 +89,7 @@ def run
 end
 
 run
+
 
 
 
