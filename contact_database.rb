@@ -44,6 +44,7 @@ class ContactDatabase
     @array_of_contacts.each do |x|
       puts "#{x[0]}: #{x[1]}(#{x[2]})"
     end
+    puts "---\nTotal of #{@array_of_contacts.length} contacts"
 
   end
 

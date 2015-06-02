@@ -24,31 +24,46 @@ def list_all_contact
   Contact.all
 end
 
-def show_a_contact
+def show_a_contact(id=nil)
   puts "Show a Contact"
-  print "Id: "
-  Contact.show(STDIN.gets.chomp)
+  unless id==nil
+    Contact.show(id)
+  else
+    print "Id: "
+    Contact.show(STDIN.gets.chomp)
+  end
 end
 
-def find_a_contact
+def find_a_contact(index=nil)
   puts "Find Contact by Contact List Index"
-  print "Index: "
-  Contact.find(STDIN.gets.chomp)
+  unless index==nil
+    Contact.find(index)
+  else
+    print "Index: "
+    Contact.find(STDIN.gets.chomp)
+  end
 end
 
-def execute(command)
+def execute(command, id)
   case command
     when "help" then help_menu
     when "new"  then new_contact
     when "list" then list_all_contact
-    when "show" then show_a_contact
-    when "find" then find_a_contact
+    when "show" then show_a_contact(id)
+    when "find" then find_a_contact(id)
     else
       puts "I dont understand your command... good day"
   end
 
 end
 
-command = ARGV.first
-execute(command)
+def run
+  command = ARGV[0]
+  id = ARGV[1]
+  execute(command, id)
+end
+
+run
+
+
 
