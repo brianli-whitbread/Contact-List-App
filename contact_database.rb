@@ -30,6 +30,7 @@ class ContactDatabase
     puts contact == nil ? "Sorry, contact cannot be found" : "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
   end
 
+  # FIXME: the search capabilities is not strong enough
   def find_contact_by_list_index(index)
     load_contacts
     if index.empty?
