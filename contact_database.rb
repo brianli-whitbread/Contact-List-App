@@ -34,7 +34,7 @@ class ContactDatabase
 
   def find_contact_by_list_index(index)
     load_contacts
-    contact_find = array_of_contacts[index]
+    contact_find = array_of_contacts[index-1]
     puts contact_find == nil ? "Sorry, Index cannot be found" : "#{contact_find[0]}: #{contact_find[1]}(#{contact_find[2]})"
   end
 
