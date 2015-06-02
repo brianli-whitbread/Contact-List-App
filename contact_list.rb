@@ -4,9 +4,9 @@ require_relative 'contact_database'
 def help_menu
   print "\n\nHere is a list of available commands:\n
     new  - Create a new contact\n
-    list - List all contacts\n
-    show - Show a contact by ID\n
-    find - Find a contact by index in address book\n\n > "
+    list - List all Contacts\n
+    show - Show a Contact by ID\n
+    find - Find by Contact Name or Contact Email\n\n > "
     execute(STDIN.gets.chomp)
 end
 
@@ -17,6 +17,8 @@ def new_contact
   print "Email: "
   email = STDIN.gets.chomp
   Contact.create(name, email)
+  #loop
+  #keep asking user for mobile type, then mobile number
 end
 
 def list_all_contact
@@ -34,10 +36,10 @@ def show_a_contact(id=nil)
   end
 end
 
-def find_a_contact(index=nil)
-  puts "Find Contact by Contact List Index"
-  unless index==nil
-    Contact.find(index)
+def find_a_contact(string=nil)
+  puts "Find by Contact Name or Contact Email"
+  unless string==nil
+    Contact.find(string)
   else
     print "Index: "
     Contact.find(STDIN.gets.chomp)

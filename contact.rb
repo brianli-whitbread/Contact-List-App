@@ -2,12 +2,13 @@ require_relative 'contact_database'
 
 class Contact
  
-  attr_accessor :name, :email
+  attr_accessor :id, :name, :email
 
   @database = ContactDatabase.new
 
-  def initialize(name, email)
+  def initialize(id, name, email)
     # TODO: assign local variables to instance variables
+    @id = id
     @name = name
     @email = email
   end
@@ -21,14 +22,12 @@ class Contact
   class << self
     def create(name, email)
       # TODO: Will initialize a contact as well as add it to the list of contacts
-      #@database.get_contacts
       @database.create_new_contact(name,email)
-      @database.save_contact
     end
  
     def find(index)
       # TODO: Will find and return contact by index
-      @database.find_contact_by_list_index(index.to_i)
+      @database.find_contact_by_list_index(index)
     end
  
     def all
