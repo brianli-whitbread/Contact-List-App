@@ -8,12 +8,16 @@ class ContactDatabase
     connect
   end
 
+  def email_exist(email)
+    select_query("SELECT email from contacts WHERE email = $1",[email])
+  end
+
   def list_all
     select_query("SELECT * FROM contacts");
   end
 
   def find_contact_by_id(id)
-    select_query("SELECT * FROM contacts WHERE id = $1",[id])
+    select_query("SELECT * FROM contacts WHERE id = $1",[id])[0]
   end
 
   def find_contact_by_name_or_email(index)
@@ -24,8 +28,11 @@ class ContactDatabase
     run_query("INSERT INTO contacts (name,email,phone_number) VALUES ($1,$2,$3) RETURNING id",[name,email,phone])
   end
 
+  def contact_update(id,name,email,phone)
+    run_query("UPDATE contacts SET name = $1, email = $2, phone_number = $3 WHERE id = $4",[name,email,phone,id])
+  end 
+
   def delete_contact(id)
-    #take passed ID and compare with compare with all records in the data base
     run_query("DELETE FROM contacts WHERE id = $1",[id])
   end
  
@@ -36,18 +43,21 @@ class ContactDatabase
   end
 
   def select_query(query,param=nil)
-    @conn.exec_params(query,param) do |results|
+    results = []
+    @conn.exec_params(query,param) do |rows|
     # results is a collection (array) of records (hashes)
-      results.map do |contacts|
+      rows.each do |contact|
         #puts author.inspect
 
-          id = contacts['id'].to_i
-          name = contacts['name']
-          email = contacts['email']
-          phone = contacts ['phone_number']
+          id = contact['id'].to_i
+          name = contact['name']
+          email = contact['email']
+          phone = contact ['phone_number']
           contact = Contact.new(id, name, email, phone)
+          results << contact
       end
     end
+    results
   end
 
   def connect

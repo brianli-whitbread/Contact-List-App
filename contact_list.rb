@@ -4,6 +4,7 @@ require_relative 'contact_database'
 def help_menu
   print "\n\nHere is a list of available commands:\n
     new  - Create a new contact\n
+    upate  - Create a new contact\n
     list - List all Contacts\n
     show - Show a Contact by ID\n
     find - Find by Contact Name or Contact Email\n\n > "
@@ -32,17 +33,51 @@ def set_phone
   return phone_numbers
 end
 
+def set_email
+  ask_for_email = true
+  while ask_for_email
+    print "Email: "
+    email = STDIN.gets.chomp.downcase
+    unless email.match /.*\@.*$/
+      puts "Sorry, your email is not in the correct format"
+    else
+      if (Contact.email_exist(email)).empty?
+        return email
+        ask_for_email = false
+      else
+        puts "Your email is already used. Please input another email address"
+      end
+    end
+  end
+end
+
 def new_contact
   puts "Add New Contact"
   print "Name: "
   name = STDIN.gets.chomp
-  print "Email: "
-  email = STDIN.gets.chomp
+  email = set_email
   phone = set_phone
-  Contact.create(name, email, phone)
-  #loop
-  #keep asking user for mobile type, then mobile number
+  contact = Contact.new(nil, name, email, phone)
+  contact.save
   puts "New Contact Created: #{name}, #{email}, #{phone}"
+end
+
+
+
+def update_contact
+  Contact.all.each do |contact|
+    puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
+  end
+  puts "\n\nWhich contact would you like to update?"
+  print "id: "
+  contact = Contact.show(STDIN.gets.chomp)
+  print "You must fill in every field!\n--------------------------\n"
+  print "Full Name: "
+  contact.name = STDIN.gets.chomp
+  contact.email = set_email
+  contact.phone = set_phone
+  contact.save
+  puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone} has been UPDATED!" 
 end
 
 def list_all_contact
@@ -80,8 +115,11 @@ def find_a_contact(string=nil)
 end
 
 def delete_contact
-  puts "Delete Contact by id"
-  print "> "
+  Contact.all.each do |contact|
+    puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
+  end
+  puts "\n\nWhich contact would you like to delete?"
+  print "id: "
   id = STDIN.gets.chomp
   Contact.delete_contact(id)
   puts "id: #{id} has been deleted"
@@ -92,6 +130,7 @@ def execute(command, id=nil)
   case command
     when "help" then help_menu
     when "new"  then new_contact
+    when "update"  then update_contact
     when "list" then list_all_contact
     when "show" then id == nil ? show_a_contact : show_a_contact(id)
     when "find" then id == nil ? find_a_contact : find_a_contact(id)
@@ -109,4 +148,12 @@ def run
 end
 
 run
+
+
+# contact.each do |con|
+#   con.email = 'Judy@gmail.com'.downcase
+#   con.name = 'Judy wong'.capitalize
+#   con.phone = set_phone
+# end
+# contact.save
 
