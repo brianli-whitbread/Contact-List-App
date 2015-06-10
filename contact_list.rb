@@ -42,32 +42,51 @@ def new_contact
   Contact.create(name, email, phone)
   #loop
   #keep asking user for mobile type, then mobile number
+  puts "New Contact Created: #{name}, #{email}, #{phone}"
 end
 
 def list_all_contact
   puts "List all contacts"
-  Contact.all
+  Contact.all.each do |contact|
+    puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
+  end
+
 end
 
 def show_a_contact(id=nil)
   puts "Show a Contact"
   unless id==nil
-    Contact.show(id)
+    contacts = Contact.show(id)
   else
-    print "Id: "
-    Contact.show(STDIN.gets.chomp)
+    print "id: "
+    contacts = Contact.show(STDIN.gets.chomp)
+  end
+  contacts.each do |contact|
+    puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
   end
 end
 
 def find_a_contact(string=nil)
   puts "Find by Contact Name or Contact Email"
   unless string==nil
-    Contact.find(string)
+    contacts = Contact.find(string)
   else
-    print "Index: "
-    Contact.find(STDIN.gets.chomp)
+    print "Search For: "
+    contacts = Contact.find(STDIN.gets.chomp)
+  end
+  contacts.each do |contact|
+    puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
   end
 end
+
+def delete_contact
+  puts "Delete Contact by id"
+  print "> "
+  id = STDIN.gets.chomp
+  Contact.delete_contact(id)
+  puts "id: #{id} has been deleted"
+end
+
 
 def execute(command, id=nil)
   case command
@@ -76,6 +95,7 @@ def execute(command, id=nil)
     when "list" then list_all_contact
     when "show" then id == nil ? show_a_contact : show_a_contact(id)
     when "find" then id == nil ? find_a_contact : find_a_contact(id)
+     when "delete" then delete_contact
     else
       puts "I dont understand your command... good day"
   end
@@ -89,7 +109,4 @@ def run
 end
 
 run
-
-
-
 

@@ -18,6 +18,10 @@ class Contact
     # TODO: return string representation of Contact
     puts "#{name} (#{email}"
   end
+
+  def destroy
+    self.class.delete_contact(id)
+  end
  
   ## Class Methods
   class << self
@@ -28,7 +32,7 @@ class Contact
  
     def find(index)
       # TODO: Will find and return contact by index
-      @database.find_contact_by_list_index(index)
+      @database.find_contact_by_name_or_email(index)
     end
  
     def all
@@ -40,7 +44,11 @@ class Contact
       # TODO: Show a contact, based on ID
       @database.find_contact_by_id(id.to_i)
     end
-    
+
+    def delete_contact(id)
+      @database.delete_contact(id)
+    end
+
   end
  
 end

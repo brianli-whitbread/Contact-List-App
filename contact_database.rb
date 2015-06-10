@@ -1,102 +1,66 @@
 ## TODO: Implement CSV reading/writing
-require 'csv'
+require 'pg'
+require 'pry'
 
 class ContactDatabase
 
-  attr_accessor :array_of_contacts, :new_user_to_add
-
-  def load_contacts
-    @new_user_to_add = []
-    @array_of_contacts = []
-
-    #loops through list, and insers each row of items into variables
-    CSV.foreach('contacts.csv', converters: :numeric) do |row|
-      #puts row.inspect
-      id = row[0]
-      name = row[1]
-      email = row[2]
-      phone = row [3]
-      contact = Contact.new(id, name, email, phone)
-      @array_of_contacts << contact
-
-
-    end
-    return @array_of_contacts
-  end
-
-  def find_contact_by_id(id)
-    load_contacts
-    contact = @array_of_contacts.detect {|contact| contact.id == id}
-    puts contact == nil ? "Sorry, contact cannot be found" : "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
-  end
-
-  # FIXME: the search capabilities is not strong enough
-  def find_contact_by_list_index(index)
-    load_contacts
-    if index.empty?
-      puts "Sorry, Index cannot be found"
-    elsif index.match /.*\.com$/
-      contact_find = @array_of_contacts.select { |contact| contact.email.match index }
-      #if multiple results, then do this
-      if contact_find.length > 1
-        contact_find.each do |contact|
-          puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
-        end
-      else
-        contact = contact_find[0]
-        puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
-      end
-    else
-      contact_find = @array_of_contacts.select { |contact| contact.name.match index }
-
-      if contact_find.length > 1
-        contact_find.each do |contact|
-          puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
-        end
-      else
-        contact_find = contact_find[0]
-        puts contact_find == nil ? "Sorry, contact cannot be found" : "#{contact_find.id}: #{contact_find.name}(#{contact_find.email})"
-      end
-
-    end
+  def initialize
+    connect
   end
 
   def list_all
-    load_contacts
-    puts "Full List of Contacts: "
-    @array_of_contacts.each do |contact|
-      puts "#{contact.id}: #{contact.name}(#{contact.email}) - Phone: #{contact.phone}"
-    end
-    puts "---\nTotal of #{@array_of_contacts.length} contacts"
-
+    select_query("SELECT * FROM contacts");
   end
 
-  def create_new_contact(name, email, phone)
-    load_contacts
-    #figures out the next ID
-    next_id_to_append = @array_of_contacts.length + 1
-    @new_user_to_add = Contact.new(next_id_to_append, name, email, phone)
-    contact_info_validation
+  def find_contact_by_id(id)
+    select_query("SELECT * FROM contacts WHERE id = $1",[id])
   end
 
-  def contact_info_validation
-    if @array_of_contacts.any?{|contact| contact.email.include? @new_user_to_add.name }
-      puts "sorry, this email has been used OR the email is not valid"
-    else
-    @array_of_contacts << @new_user_to_add
-    save_contact
-    puts "#{new_user_to_add.id}: #{new_user_to_add.name}(#{new_user_to_add.email}) has been successfully saved"
-    end
+  def find_contact_by_name_or_email(index)
+    select_query("SELECT * FROM contacts WHERE name LIKE '%' || $1 || '%' OR email LIKE '%' || $1 || '%'",[index])
   end
 
-  def save_contact
-    # Appends to the file
-    # enters, and information is passed on to the database
-    CSV.open('contacts.csv', 'w') do |csv_object|
-      @array_of_contacts.each do |contact|
-        csv_object << [contact.id, contact.name, contact.email, contact.phone]
+  def create_new_contact(name,email,phone)
+    run_query("INSERT INTO contacts (name,email,phone_number) VALUES ($1,$2,$3) RETURNING id",[name,email,phone])
+  end
+
+  def delete_contact(id)
+    #take passed ID and compare with compare with all records in the data base
+    run_query("DELETE FROM contacts WHERE id = $1",[id])
+  end
+ 
+  private
+
+  def run_query(query, param)
+    @conn.exec_params(query,param)
+  end
+
+  def select_query(query,param=nil)
+    @conn.exec_params(query,param) do |results|
+    # results is a collection (array) of records (hashes)
+      results.map do |contacts|
+        #puts author.inspect
+
+          id = contacts['id'].to_i
+          name = contacts['name']
+          email = contacts['email']
+          phone = contacts ['phone_number']
+          contact = Contact.new(id, name, email, phone)
       end
     end
+  end
+
+  def connect
+    @conn = PG.connect(
+      host: 'localhost',
+      dbname: 'contact_list_v2',
+      user: 'development',
+      password: 'development'
+    )
+  end
+
+  def closing_connection
+    @conn.close
   end
 
 end
