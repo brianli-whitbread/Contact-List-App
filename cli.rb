@@ -35,8 +35,18 @@ class Cli
     last_name = STDIN.gets.chomp.capitalize
     email = set_email
     phone = set_phone
-    contact = Contact.new(first_name: '#{first_name}', last_name: '#{last_name}', email: '#{email}', phone: '#{phone}')
+    contact = Contact.new(first_name: first_name, last_name: last_name, email: email, phone: phone)
+    contact.save
+    puts "#{first_name} #{last_name} (#{email}) has been saved."
   end
+
+  #update
+  def update
+
+  end
+
+  private
+  #utilities
 
   #setemail
   def set_email
@@ -59,9 +69,7 @@ end
 
 def set_phone
   phone_numbers = ''
-
   adding_phone_numbers = true
-
   while adding_phone_numbers
     phone_numbers << "; " unless phone_numbers.empty?
     puts "Label for the Phone Number"
@@ -78,12 +86,6 @@ def set_phone
   end
   return phone_numbers.capitalize
   end
-
-  #update
-  def update
-  end
-
-  
 
 
   def start
