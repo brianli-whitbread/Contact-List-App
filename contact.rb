@@ -1,6 +1,6 @@
 require_relative 'contact_database'
 
-class Contact
+class Contact 
  
   attr_accessor :id, :name, :email, :phone
 

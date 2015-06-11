@@ -147,6 +147,7 @@ def run
   execute(command, id)
 end
 
+connect
 run
 
 
